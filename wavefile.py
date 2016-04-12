@@ -32,21 +32,22 @@ class WaveFile(object):
         self.subchunk2_size = self.samples_num * self.channels_num * self.bits_per_sample / 8
         with open(filename, 'wb') as f:
             # write RIFF header
-            f.write('RIFF')
-            f.write(struct.pack('<i', 4 + (8 + self.subchunk_size) + (8 + self.subchunk2_size)))
-            f.write('WAVE')
+            f.write(bytes('RIFF', 'UTF-8'))
+            length = 4 + (8 + self.subchunk_size) + (8 + self.subchunk2_size)
+            f.write(struct.pack('<i', int(length)))
+            f.write(bytes('WAVE', 'UTF-8'))
             # write fmt subchunk
-            f.write('fmt ')                                     # chunk type
-            f.write(struct.pack('<i', self.subchunk_size))      # data size
-            f.write(struct.pack('<h', self.compression_type))   # compression type
-            f.write(struct.pack('<h', self.channels_num))       # channels
-            f.write(struct.pack('<i', self.sample_rate))        # sample rate
-            f.write(struct.pack('<i', self.byte_rate))          # byte rate
-            f.write(struct.pack('<h', self.block_alignment))    # block alignment
-            f.write(struct.pack('<h', self.bits_per_sample))    # sample depth
+            f.write(bytes('fmt ', 'UTF-8'))                                     # chunk type
+            f.write(struct.pack('<i', int(self.subchunk_size))  )    # data size
+            f.write(struct.pack('<h', int(self.compression_type)))   # compression type
+            f.write(struct.pack('<h', int(self.channels_num))   )    # channels
+            f.write(struct.pack('<i', int(self.sample_rate))    )    # sample rate
+            f.write(struct.pack('<i', int(self.byte_rate))      )    # byte rate
+            f.write(struct.pack('<h', int(self.block_alignment)))    # block alignment
+            f.write(struct.pack('<h', int(self.bits_per_sample)))    # sample depth
             # write data subchunk
-            f.write('data')
-            f.write(struct.pack ('<i', self.subchunk2_size))
+            f.write(bytes('data', 'UTF-8'))
+            f.write(struct.pack ('<i', int(self.subchunk2_size)))
             for d in self.data:
                 sound_data = struct.pack('<h', d)
                 f.write(sound_data)

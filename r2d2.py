@@ -6,7 +6,9 @@
 
 import math
 import random
-import winsound
+#import winsound
+import simpleaudio as sa
+
 from wavefile import WaveFile
 
 
@@ -32,20 +34,19 @@ def generate_sin_wave(sample_rate, frequency, duration, amplitude):
     data = []
     samples_num = int(duration * sample_rate)
     volume = amplitude * 32767
-    for n in xrange(samples_num):
+    for n in range(samples_num):
         value = math.sin(2 * math.pi * n * frequency / sample_rate)
         data.append(int(value * volume))
     return data
 
 
-def generate_r2d2_message(filename):
+def generate_r2d2_message(filename, length):
     """
     Generate R2D2 message and save to `filename`
     """
-    min_msg_len = 1
-    max_msg_len = 20
+
     r2d2_message = []
-    for _ in range(random.randint(min_msg_len, max_msg_len)):
+    for _ in range(length):
         r2d2_message.append(note_freqs[random.randint(0, len(note_freqs) - 1)])
 
     sample_rate = 8000  # 8000 Hz
@@ -61,13 +62,21 @@ def generate_r2d2_message(filename):
     wave.add_data_subchunk(wave_duration, wave_data)
     wave.save(filename)
 
-
-def main():
-    filename = 'r2d2.wav'
-    generate_r2d2_message(filename)
+def generate_play(length):
+    filename = '/tmp/r2d2.wav'
+    generate_r2d2_message(filename, length)
 
     # play R2D2 message
-    winsound.PlaySound(filename, winsound.SND_FILENAME)
+    wave_obj = sa.WaveObject.from_wave_file(filename)
+    play_obj = wave_obj.play()
+    play_obj.wait_done()
+
+def main():
+    min_msg_len = 4
+    max_msg_len = 20
+    length = random.randint(min_msg_len, max_msg_len)
+    generate_play(length)
+#    winsound.PlaySound(filename, winsound.SND_FILENAME)
 
 
 if __name__ == '__main__':
